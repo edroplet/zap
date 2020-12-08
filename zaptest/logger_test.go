@@ -27,9 +27,9 @@ import (
 	"strings"
 	"testing"
 
-	"go.uber.org/zap"
-	"go.uber.org/zap/internal/ztest"
-	"go.uber.org/zap/zapcore"
+	"github.com/edroplet/zap"
+	"github.com/edroplet/zap/internal/ztest"
+	"github.com/edroplet/zap/zapcore"
 
 	"github.com/stretchr/testify/assert"
 )

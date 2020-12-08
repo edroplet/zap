@@ -23,9 +23,9 @@ package zapgrpc
 import (
 	"testing"
 
-	"go.uber.org/zap"
-	"go.uber.org/zap/zapcore"
-	"go.uber.org/zap/zaptest/observer"
+	"github.com/edroplet/zap"
+	"github.com/edroplet/zap/zapcore"
+	"github.com/edroplet/zap/zaptest/observer"
 
 	"github.com/stretchr/testify/require"
 )

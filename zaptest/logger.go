@@ -23,8 +23,8 @@ package zaptest
 import (
 	"bytes"
 
-	"go.uber.org/zap"
-	"go.uber.org/zap/zapcore"
+	"github.com/edroplet/zap"
+	"github.com/edroplet/zap/zapcore"
 )
 
 // LoggerOption configures the test logger built by NewLogger.

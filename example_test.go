@@ -27,8 +27,8 @@ import (
 	"os"
 	"time"
 
-	"go.uber.org/zap"
-	"go.uber.org/zap/zapcore"
+	"github.com/edroplet/zap"
+	"github.com/edroplet/zap/zapcore"
 )
 
 func Example_presets() {
