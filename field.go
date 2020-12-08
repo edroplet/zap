@@ -21,6 +21,7 @@
 package zap
 
 import (
+	"encoding/json"
 	"fmt"
 	"math"
 	"time"
@@ -522,4 +523,12 @@ func Any(key string, value interface{}) Field {
 	default:
 		return Reflect(key, val)
 	}
+}
+
+func AnyString(key string, value interface{}) zapcore.Field {
+	bvalue, err := json.Marshal(value)
+	if err != nil {
+		return Any(key, value)
+	}
+	return String(key, string(bvalue))
 }
