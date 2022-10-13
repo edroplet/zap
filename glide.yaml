@@ -1,4 +1,4 @@
-package: github.com/edroplet/zap
+package: go.uber.org/zap
 license: MIT
 import:
 - package: go.uber.org/atomic

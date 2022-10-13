@@ -23,7 +23,7 @@ package main
 import (
 	"flag"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"os"
 	"os/exec"
@@ -59,7 +59,7 @@ func do() error {
 	if err != nil {
 		return err
 	}
-	data, err := ioutil.ReadAll(os.Stdin)
+	data, err := io.ReadAll(os.Stdin)
 	if err != nil {
 		return err
 	}
@@ -234,7 +234,7 @@ func (b benchmarkRowsByTime) Less(i, j int) bool {
 	leftZap, rightZap := strings.Contains(left.Name, "zap"), strings.Contains(right.Name, "zap")
 
 	// If neither benchmark is for zap or both are, sort by time.
-	if !(leftZap || rightZap) || (leftZap && rightZap) {
+	if leftZap == rightZap {
 		return left.Time.Nanoseconds() < right.Time.Nanoseconds()
 	}
 	// Sort zap benchmark first.

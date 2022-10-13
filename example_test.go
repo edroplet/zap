@@ -22,13 +22,13 @@ package zap_test
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"log"
 	"os"
 	"time"
 
-	"github.com/edroplet/zap"
-	"github.com/edroplet/zap/zapcore"
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 )
 
 func Example_presets() {
@@ -91,10 +91,7 @@ func Example_basicConfiguration() {
 	if err := json.Unmarshal(rawJSON, &cfg); err != nil {
 		panic(err)
 	}
-	logger, err := cfg.Build()
-	if err != nil {
-		panic(err)
-	}
+	logger := zap.Must(cfg.Build())
 	defer logger.Sync()
 
 	logger.Info("logger construction succeeded")
@@ -125,8 +122,8 @@ func Example_advancedConfiguration() {
 	// implement io.Writer, we can use zapcore.AddSync to add a no-op Sync
 	// method. If they're not safe for concurrent use, we can add a protecting
 	// mutex with zapcore.Lock.)
-	topicDebugging := zapcore.AddSync(ioutil.Discard)
-	topicErrors := zapcore.AddSync(ioutil.Discard)
+	topicDebugging := zapcore.AddSync(io.Discard)
+	topicErrors := zapcore.AddSync(io.Discard)
 
 	// High-priority output should also go to standard error, and low-priority
 	// output should also go to standard out.
@@ -163,6 +160,45 @@ func ExampleNamespace() {
 	).Info("tracked some metrics")
 	// Output:
 	// {"level":"info","msg":"tracked some metrics","metrics":{"counter":1}}
+}
+
+type addr struct {
+	IP   string
+	Port int
+}
+
+type request struct {
+	URL    string
+	Listen addr
+	Remote addr
+}
+
+func (a addr) MarshalLogObject(enc zapcore.ObjectEncoder) error {
+	enc.AddString("ip", a.IP)
+	enc.AddInt("port", a.Port)
+	return nil
+}
+
+func (r *request) MarshalLogObject(enc zapcore.ObjectEncoder) error {
+	enc.AddString("url", r.URL)
+	zap.Inline(r.Listen).AddTo(enc)
+	return enc.AddObject("remote", r.Remote)
+}
+
+func ExampleObject() {
+	logger := zap.NewExample()
+	defer logger.Sync()
+
+	req := &request{
+		URL:    "/test",
+		Listen: addr{"127.0.0.1", 8080},
+		Remote: addr{"127.0.0.1", 31200},
+	}
+	logger.Info("new request, in nested object", zap.Object("req", req))
+	logger.Info("new request, inline", zap.Inline(req))
+	// Output:
+	// {"level":"info","msg":"new request, in nested object","req":{"url":"/test","ip":"127.0.0.1","port":8080,"remote":{"ip":"127.0.0.1","port":31200}}}
+	// {"level":"info","msg":"new request, inline","url":"/test","ip":"127.0.0.1","port":8080,"remote":{"ip":"127.0.0.1","port":31200}}
 }
 
 func ExampleNewStdLog() {
@@ -239,10 +275,7 @@ func ExampleAtomicLevel_config() {
 	if err := json.Unmarshal(rawJSON, &cfg); err != nil {
 		panic(err)
 	}
-	logger, err := cfg.Build()
-	if err != nil {
-		panic(err)
-	}
+	logger := zap.Must(cfg.Build())
 	defer logger.Sync()
 
 	logger.Info("info logging enabled")

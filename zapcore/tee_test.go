@@ -24,9 +24,9 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/edroplet/zap/internal/ztest"
-	. "github.com/edroplet/zap/zapcore"
-	"github.com/edroplet/zap/zaptest/observer"
+	"go.uber.org/zap/internal/ztest"
+	. "go.uber.org/zap/zapcore"
+	"go.uber.org/zap/zaptest/observer"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -47,6 +47,44 @@ func TestTeeUnusualInput(t *testing.T) {
 	t.Run("no input", func(t *testing.T) {
 		assert.Equal(t, NewNopCore(), NewTee(), "Expected to return NopCore.")
 	})
+}
+
+func TestLevelOfTee(t *testing.T) {
+	debugLogger, _ := observer.New(DebugLevel)
+	warnLogger, _ := observer.New(WarnLevel)
+
+	tests := []struct {
+		desc string
+		give []Core
+		want Level
+	}{
+		{desc: "empty", want: InvalidLevel},
+		{
+			desc: "debug",
+			give: []Core{debugLogger},
+			want: DebugLevel,
+		},
+		{
+			desc: "warn",
+			give: []Core{warnLogger},
+			want: WarnLevel,
+		},
+		{
+			desc: "debug and warn",
+			give: []Core{warnLogger, debugLogger},
+			want: DebugLevel,
+		},
+	}
+
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.desc, func(t *testing.T) {
+			t.Parallel()
+
+			core := NewTee(tt.give...)
+			assert.Equal(t, tt.want, LevelOf(core), "Level of Tee core did not match.")
+		})
+	}
 }
 
 func TestTeeCheck(t *testing.T) {

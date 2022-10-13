@@ -23,7 +23,6 @@ package zap_test
 import (
 	"bytes"
 	"encoding/json"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -31,8 +30,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/edroplet/zap"
-	"github.com/edroplet/zap/zapcore"
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -43,8 +42,8 @@ import (
 // intended to match on the function name, while this is on the full output
 // which includes filenames.
 var _zapPackages = []string{
-	"github.com/edroplet/zap.",
-	"github.com/edroplet/zap/zapcore.",
+	"go.uber.org/zap.",
+	"go.uber.org/zap/zapcore.",
 }
 
 func TestStacktraceFiltersZapLog(t *testing.T) {
@@ -104,7 +103,7 @@ func TestStacktraceFiltersVendorZap(t *testing.T) {
 		setupSymlink(t, curFile, filepath.Join(testDir, curFile))
 
 		// Set up symlinks for zap, and for any test dependencies.
-		setupSymlink(t, zapDir, filepath.Join(vendorDir, "github.com/edroplet/zap"))
+		setupSymlink(t, zapDir, filepath.Join(vendorDir, "go.uber.org/zap"))
 		for _, dep := range deps {
 			setupSymlink(t, dep.Dir, filepath.Join(vendorDir, dep.ImportPath))
 		}
@@ -161,12 +160,8 @@ func verifyNoZap(t *testing.T, logs string) {
 }
 
 func withGoPath(t *testing.T, f func(goPath string)) {
-	goPath, err := ioutil.TempDir("", "gopath")
-	require.NoError(t, err, "Failed to create temporary directory for GOPATH")
-	//defer os.RemoveAll(goPath)
-
-	os.Setenv("GOPATH", goPath)
-	defer os.Setenv("GOPATH", os.Getenv("GOPATH"))
+	goPath := filepath.Join(t.TempDir(), "gopath")
+	t.Setenv("GOPATH", goPath)
 
 	f(goPath)
 }

@@ -22,7 +22,7 @@
 // packages can recreate the same functionality with buffers.NewPool.
 package bufferpool
 
-import "github.com/edroplet/zap/buffer"
+import "go.uber.org/zap/buffer"
 
 var (
 	_pool = buffer.NewPool()

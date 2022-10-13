@@ -25,8 +25,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/edroplet/zap/internal/ztest"
-	"github.com/edroplet/zap/zapcore"
+	"go.uber.org/zap/internal/ztest"
+	"go.uber.org/zap/zapcore"
 )
 
 type user struct {
@@ -175,6 +175,24 @@ func BenchmarkAddCallerHook(b *testing.B) {
 	b.RunParallel(func(pb *testing.PB) {
 		for pb.Next() {
 			logger.Info("Caller.")
+		}
+	})
+}
+
+func BenchmarkAddCallerAndStacktrace(b *testing.B) {
+	logger := New(
+		zapcore.NewCore(
+			zapcore.NewJSONEncoder(NewProductionConfig().EncoderConfig),
+			&ztest.Discarder{},
+			InfoLevel,
+		),
+		AddCaller(),
+		AddStacktrace(WarnLevel),
+	)
+	b.ResetTimer()
+	b.RunParallel(func(pb *testing.PB) {
+		for pb.Next() {
+			logger.Warn("Caller and stacktrace.")
 		}
 	})
 }

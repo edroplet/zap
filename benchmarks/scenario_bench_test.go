@@ -21,11 +21,11 @@
 package benchmarks
 
 import (
-	"io/ioutil"
+	"io"
 	"log"
 	"testing"
 
-	"github.com/edroplet/zap"
+	"go.uber.org/zap"
 )
 
 func BenchmarkDisabledWithoutFields(b *testing.B) {
@@ -316,7 +316,7 @@ func BenchmarkWithoutFields(b *testing.B) {
 		})
 	})
 	b.Run("stdlib.Println", func(b *testing.B) {
-		logger := log.New(ioutil.Discard, "", log.LstdFlags)
+		logger := log.New(io.Discard, "", log.LstdFlags)
 		b.ResetTimer()
 		b.RunParallel(func(pb *testing.PB) {
 			for pb.Next() {
@@ -325,7 +325,7 @@ func BenchmarkWithoutFields(b *testing.B) {
 		})
 	})
 	b.Run("stdlib.Printf", func(b *testing.B) {
-		logger := log.New(ioutil.Discard, "", log.LstdFlags)
+		logger := log.New(io.Discard, "", log.LstdFlags)
 		b.ResetTimer()
 		b.RunParallel(func(pb *testing.PB) {
 			for pb.Next() {

@@ -21,11 +21,11 @@
 package zap
 
 import (
-	"fmt"
+	"errors"
 	"sort"
 	"time"
 
-	"github.com/edroplet/zap/zapcore"
+	"go.uber.org/zap/zapcore"
 )
 
 // SamplingConfig sets a sampling strategy for the logger. Sampling caps the
@@ -182,7 +182,7 @@ func (cfg Config) Build(opts ...Option) (*Logger, error) {
 	}
 
 	if cfg.Level == (AtomicLevel{}) {
-		return nil, fmt.Errorf("missing Level")
+		return nil, errors.New("missing Level")
 	}
 
 	log := New(

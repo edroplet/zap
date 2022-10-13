@@ -22,13 +22,12 @@ package zapcore_test
 
 import (
 	"errors"
-	"io/ioutil"
 	"os"
 	"testing"
 	"time"
 
-	"github.com/edroplet/zap/internal/ztest"
-	. "github.com/edroplet/zap/zapcore"
+	"go.uber.org/zap/internal/ztest"
+	. "go.uber.org/zap/zapcore"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -68,9 +67,8 @@ func TestNopCore(t *testing.T) {
 }
 
 func TestIOCore(t *testing.T) {
-	temp, err := ioutil.TempFile("", "zapcore-test-iocore")
-	require.NoError(t, err, "Failed to create temp file.")
-	defer os.Remove(temp.Name())
+	temp, err := os.CreateTemp(t.TempDir(), "test.log")
+	require.NoError(t, err)
 
 	// Drop timestamps for simpler assertions (timestamp encoding is tested
 	// elsewhere).
@@ -84,6 +82,10 @@ func TestIOCore(t *testing.T) {
 	).With([]Field{makeInt64Field("k", 1)})
 	defer assert.NoError(t, core.Sync(), "Expected Syncing a temp file to succeed.")
 
+	t.Run("LevelOf", func(t *testing.T) {
+		assert.Equal(t, InfoLevel, LevelOf(core), "Incorrect Core Level")
+	})
+
 	if ce := core.Check(Entry{Level: DebugLevel, Message: "debug"}, nil); ce != nil {
 		ce.Write(makeInt64Field("k", 2))
 	}
@@ -94,7 +96,7 @@ func TestIOCore(t *testing.T) {
 		ce.Write(makeInt64Field("k", 4))
 	}
 
-	logged, err := ioutil.ReadFile(temp.Name())
+	logged, err := os.ReadFile(temp.Name())
 	require.NoError(t, err, "Failed to read from temp file.")
 	require.Equal(
 		t,

@@ -23,7 +23,7 @@ package zap
 import (
 	"testing"
 
-	"github.com/edroplet/zap/zapcore"
+	"go.uber.org/zap/zapcore"
 
 	"github.com/stretchr/testify/assert"
 )

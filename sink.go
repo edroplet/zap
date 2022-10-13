@@ -29,7 +29,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/edroplet/zap/zapcore"
+	"go.uber.org/zap/zapcore"
 )
 
 const schemeFile = "file"

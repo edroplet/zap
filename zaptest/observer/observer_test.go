@@ -1,4 +1,4 @@
-// Copyright (c) 2016 Uber Technologies, Inc.
+// Copyright (c) 2016-2022 Uber Technologies, Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -27,9 +27,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/edroplet/zap"
-	"github.com/edroplet/zap/zapcore"
-	. "github.com/edroplet/zap/zaptest/observer"
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
+	. "go.uber.org/zap/zaptest/observer"
 )
 
 func assertEmpty(t testing.TB, logs *ObservedLogs) {
@@ -40,6 +40,10 @@ func assertEmpty(t testing.TB, logs *ObservedLogs) {
 func TestObserver(t *testing.T) {
 	observer, logs := New(zap.InfoLevel)
 	assertEmpty(t, logs)
+
+	t.Run("LevelOf", func(t *testing.T) {
+		assert.Equal(t, zap.InfoLevel, zapcore.LevelOf(observer), "Observer reported the wrong log level.")
+	})
 
 	assert.NoError(t, observer.Sync(), "Unexpected failure in no-op Sync")
 
@@ -55,7 +59,7 @@ func TestObserver(t *testing.T) {
 	assert.Equal(t, want, logs.AllUntimed(), "Unexpected contents from AllUntimed.")
 
 	all := logs.All()
-	require.Equal(t, 1, len(all), "Unexpected numbed of LoggedEntries returned from All.")
+	require.Equal(t, 1, len(all), "Unexpected number of LoggedEntries returned from All.")
 	assert.NotEqual(t, time.Time{}, all[0].Time, "Expected non-zero time on LoggedEntry.")
 
 	// copy & zero time for stable assertions
@@ -149,6 +153,22 @@ func TestFilters(t *testing.T) {
 			Entry:   zapcore.Entry{Level: zap.InfoLevel, Message: "any slice"},
 			Context: []zapcore.Field{zap.Any("slice", []string{"a"})},
 		},
+		{
+			Entry:   zapcore.Entry{Level: zap.InfoLevel, Message: "msg 2"},
+			Context: []zapcore.Field{zap.Int("b", 2), zap.Namespace("filterMe")},
+		},
+		{
+			Entry:   zapcore.Entry{Level: zap.InfoLevel, Message: "any slice"},
+			Context: []zapcore.Field{zap.Any("filterMe", []string{"b"})},
+		},
+		{
+			Entry:   zapcore.Entry{Level: zap.WarnLevel, Message: "danger will robinson"},
+			Context: []zapcore.Field{zap.Int("b", 42)},
+		},
+		{
+			Entry:   zapcore.Entry{Level: zap.ErrorLevel, Message: "warp core breach"},
+			Context: []zapcore.Field{zap.Int("b", 42)},
+		},
 	}
 
 	logger, sink := New(zap.InfoLevel)
@@ -205,6 +225,29 @@ func TestFilters(t *testing.T) {
 			msg:      "filter for slice",
 			filtered: sink.FilterField(zap.Any("slice", []string{"a"})),
 			want:     logs[6:7],
+		},
+		{
+			msg:      "filter field key",
+			filtered: sink.FilterFieldKey("filterMe"),
+			want:     logs[7:9],
+		},
+		{
+			msg: "filter by arbitrary function",
+			filtered: sink.Filter(func(e LoggedEntry) bool {
+				return len(e.Context) > 1
+			}),
+			want: func() []LoggedEntry {
+				// Do not modify logs slice.
+				w := make([]LoggedEntry, 0, len(logs))
+				w = append(w, logs[0:5]...)
+				w = append(w, logs[7])
+				return w
+			}(),
+		},
+		{
+			msg:      "filter level",
+			filtered: sink.FilterLevelExact(zap.WarnLevel),
+			want:     logs[9:10],
 		},
 	}
 

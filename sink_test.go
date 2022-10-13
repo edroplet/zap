@@ -22,7 +22,7 @@ package zap
 
 import (
 	"bytes"
-	"io/ioutil"
+	"io"
 	"net/url"
 	"strings"
 	"testing"
@@ -30,7 +30,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/edroplet/zap/zapcore"
+	"go.uber.org/zap/zapcore"
 )
 
 func TestRegisterSink(t *testing.T) {
@@ -49,7 +49,7 @@ func TestRegisterSink(t *testing.T) {
 	nopFactory := func(u *url.URL) (Sink, error) {
 		assert.Equal(t, u.Scheme, nopScheme, "Scheme didn't match registration.")
 		nopCalls++
-		return nopCloserSink{zapcore.AddSync(ioutil.Discard)}, nil
+		return nopCloserSink{zapcore.AddSync(io.Discard)}, nil
 	}
 
 	defer resetSinkRegistry()
@@ -75,7 +75,7 @@ func TestRegisterSink(t *testing.T) {
 
 func TestRegisterSinkErrors(t *testing.T) {
 	nopFactory := func(_ *url.URL) (Sink, error) {
-		return nopCloserSink{zapcore.AddSync(ioutil.Discard)}, nil
+		return nopCloserSink{zapcore.AddSync(io.Discard)}, nil
 	}
 	tests := []struct {
 		scheme string

@@ -23,8 +23,8 @@ package zapcore_test
 import (
 	"testing"
 
-	"github.com/edroplet/zap/internal/ztest"
-	. "github.com/edroplet/zap/zapcore"
+	"go.uber.org/zap/internal/ztest"
+	. "go.uber.org/zap/zapcore"
 )
 
 func withBenchedTee(b *testing.B, f func(Core)) {

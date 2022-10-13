@@ -20,13 +20,13 @@
 
 package zaptest
 
-import "github.com/edroplet/zap/internal/ztest"
+import "go.uber.org/zap/internal/ztest"
 
 type (
 	// A Syncer is a spy for the Sync portion of zapcore.WriteSyncer.
 	Syncer = ztest.Syncer
 
-	// A Discarder sends all writes to ioutil.Discard.
+	// A Discarder sends all writes to io.Discard.
 	Discarder = ztest.Discarder
 
 	// FailWriter is a WriteSyncer that always returns an error on writes.

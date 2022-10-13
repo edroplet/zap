@@ -401,6 +401,16 @@ func Object(key string, val zapcore.ObjectMarshaler) Field {
 	return Field{Key: key, Type: zapcore.ObjectMarshalerType, Interface: val}
 }
 
+// Inline constructs a Field that is similar to Object, but it
+// will add the elements of the provided ObjectMarshaler to the
+// current namespace.
+func Inline(val zapcore.ObjectMarshaler) Field {
+	return zapcore.Field{
+		Type:      zapcore.InlineMarshalerType,
+		Interface: val,
+	}
+}
+
 // Any takes a key and an arbitrary value and chooses the best way to represent
 // them as a field, falling back to a reflection-based approach only if
 // necessary.
@@ -539,7 +549,7 @@ func Any(key string, value interface{}) Field {
 	}
 }
 
-func AnyString(key string, value interface{}) zapcore.Field {
+func AnyString(key string, value interface{}) Field {
 	bvalue, err := json.Marshal(value)
 	if err != nil {
 		return Any(key, value)

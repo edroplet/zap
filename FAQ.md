@@ -99,7 +99,7 @@ if err != nil {
 
 ## Installation
 
-### What does the error `expects import "github.com/edroplet/zap"` mean?
+### What does the error `expects import "go.uber.org/zap"` mean?
 
 Either zap was installed incorrectly or you're referencing the wrong package
 name in your code.
@@ -112,7 +112,7 @@ package.
 
 If you follow two simple rules, everything should work: install zap with `go
 get -u go.uber.org/zap`, and always import it in your code with `import
-"github.com/edroplet/zap"`. Your code shouldn't contain *any* references to
+"go.uber.org/zap"`. Your code shouldn't contain *any* references to
 `github.com/uber-go/zap`.
 
 ## Usage
@@ -157,6 +157,7 @@ We're aware of the following extensions, but haven't used them ourselves:
 | `github.com/fgrosse/zaptest` | Ginkgo |
 | `github.com/blendle/zapdriver` | Stackdriver |
 | `github.com/moul/zapgorm` | Gorm |
+| `github.com/moul/zapfilter` | Advanced filtering rules |
 
 [go-proverbs]: https://go-proverbs.github.io/
 [import-path]: https://golang.org/cmd/go/#hdr-Remote_import_paths

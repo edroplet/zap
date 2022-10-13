@@ -27,8 +27,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/atomic"
-	"github.com/edroplet/zap/internal/ztest"
-	. "github.com/edroplet/zap/zapcore"
+	"go.uber.org/zap/internal/ztest"
+	. "go.uber.org/zap/zapcore"
 )
 
 var counterTestCases = [][]string{
@@ -274,10 +274,12 @@ func BenchmarkSampler_CheckWithHook(b *testing.B) {
 					}
 				}
 			})
+			// We expect to see 1000 dropped messages for every sampled per settings,
+			// with a delta due to less 1000 messages getting dropped after initial one
+			// is sampled.
+			assert.Greater(b, dropped.Load()/1000, sampled.Load()-1000)
+			dropped.Store(0)
+			sampled.Store(0)
 		})
 	}
-	// We expect to see 1000 dropped messages for every sampled per settings,
-	// with a delta due to less 1000 messages getting dropped after initial one
-	// is sampled.
-	assert.Greater(b, dropped.Load()/1000, sampled.Load()-1000)
 }

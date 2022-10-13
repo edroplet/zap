@@ -24,7 +24,7 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/edroplet/zap/zapcore"
+	"go.uber.org/zap/zapcore"
 
 	richErrors "github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
