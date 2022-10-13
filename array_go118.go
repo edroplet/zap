@@ -26,7 +26,7 @@ package zap
 import (
 	"fmt"
 
-	"go.uber.org/zap/zapcore"
+	"github.com/edroplet/zap/zapcore"
 )
 
 // Objects constructs a field with the given key, holding a list of the

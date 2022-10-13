@@ -28,10 +28,10 @@ import (
 	"testing"
 	"time"
 
+	"github.com/edroplet/zap"
+	. "github.com/edroplet/zap/zapcore"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"go.uber.org/zap"
-	. "go.uber.org/zap/zapcore"
 )
 
 type users int
